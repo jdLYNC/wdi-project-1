@@ -28,6 +28,15 @@
         <span class="score">0</span>
       </div>
     </header>
-    <main class="game">
+    <main class="game mouseHider">
+      <div class="endScreen hidden">
+        <h1>Game Over</h1>
+        Final Score <span class="score">0</span>
+        <button>Play Again?</button>
+      </div>
+      <audio id="blip" src="audio/blip.wav"></audio>
+      <audio id="thud" src="audio/thud.wav"></audio>
+      <audio id="music" src="audio/ambience.wav" autoplay="autoplay" loop="loop"></audio>
+    </main>
     </body>
 </html>
