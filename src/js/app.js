@@ -10,7 +10,7 @@ let boardRotation = 0;
 // Board global variables.
 let boardHeight = null;
 let boardWidth = null;
-let boardRotationSpeed = 0.25;
+let boardRotationSpeed = 0;
 
 // Hole size/position minimum constants.
 const holeHeightMin = 50;
@@ -37,22 +37,31 @@ let time = null;
 let timer = null;
 
 // Other game global variables.
-let gameActive = true;
+let xPosition = null;
+let yPosition = null;
+let gameActive = false;
 let gamePaused = false;
+let highScore = 0;
 
 // ________________________________On DOM Load__________________________________
 $(() => {
 
   // ______________________________DOM Elements_________________________________
   const $window = $(window);
+  const $document = $(document);
   const $main = $('.game');
   const $lives = $('.lives');
   const $time = $('.time');
   const $score = $('.score');
+  const $startScreen = $('.startScreen');
   const $endScreen = $('.endScreen');
-  const $reset = $('button');
+  const $start = $('.start');
+  const $reveal = $('.reveal');
+  const $reset = $('.reset');
+  const $highScore = $('.highScore');
   const blip = document.getElementById('blip');
   const thud = document.getElementById('thud');
+  const endSound = document.getElementById('gameEnd');
   let $board = null;
   let $shape = null;
   let $hole = null;
@@ -87,7 +96,7 @@ $(() => {
       .width(boardWidth)
       .css({ top: boardTopPosition, left: boardLeftPosition, transform: 'rotate(' + boardRotation + 'deg)' })
       .addClass('board');
-    $main.append(board);
+    $main.append(board.hide().fadeIn(1000));
 
     $board = $('.board');
   }
@@ -105,7 +114,7 @@ $(() => {
     holeWidth = rangePointSelector(holeWidthMax, holeWidthMin);
     holeRotation = rangePointSelector(0, 0);
     // Hole DOM element creation.
-    const hole = $('<div></div>')
+    const hole = $('<div/>')
       .height(holeHeight)
       .width(holeWidth)
       .css({ top: holeTopPosition, left: holeLeftPosition, transform: 'rotate(' + holeRotation + 'deg)' })
@@ -121,11 +130,14 @@ $(() => {
     // Shape DOM element creation.
     heightDifferential = (holeHeight / 100) * differential;
     widthDifferential = (holeWidth / 100) * differential;
-    const shape = $('<div></div>')
+    const shape = $('<div/>', { class: 'shape' })
       .height(holeHeight - heightDifferential)
-      .width(holeWidth - widthDifferential)
-      .addClass('shape');
-    $main.append(shape);
+      .width(holeWidth - widthDifferential);
+
+    if (xPosition && yPosition) {
+      shape.css({ left: Math.floor(xPosition - (holeWidth / 2)), top: Math.floor(yPosition - (holeHeight / 2)) });
+    }
+    $main.append(shape.hide().fadeIn(1000));
 
     $shape = $('.shape');
 
@@ -138,8 +150,10 @@ $(() => {
 
   // Shape movement functions.
   function mousePositionUpdate(e) {
+    xPosition = e.clientX;
+    yPosition = e.clientY;
     if (gameActive) {
-      $shape.css({ left: Math.floor(e.clientX - (holeWidth / 2)), top: Math.floor(e.clientY - (holeHeight / 2)) });
+      $shape.css({ left: Math.floor(xPosition - (holeWidth / 2)), top: Math.floor(yPosition - (holeHeight / 2)) });
     } else {
       // console.log(e.clientX, e.clientY);
     }
@@ -149,6 +163,11 @@ $(() => {
     e.preventDefault();
     const shapeRotation = $window.scrollTop() / 1000 % Math.PI;
     $shape.css({ transform: 'rotate(' + shapeRotation + 'rad)' });
+    if (document.documentElement.clientHeight + $window.scrollTop() >= $document.height()) {
+      $document.scrollTop(0)
+    } else if ($window.scrollTop() < 1) {
+      $document.scrollTop($document.height())
+    }
     // console.log('Shape rotation/transform at ' + matrixToDegrees($shape));
 
     // if(
@@ -178,6 +197,11 @@ $(() => {
     $shape.remove();
   }
 
+  function runFadeOuts() {
+    $board.fadeOut(1000);
+    $shape.fadeOut(1000);
+  }
+
   // GUI functions.
   function scoreAnimation(color) {
     $score.animate({
@@ -193,8 +217,19 @@ $(() => {
   // Game logic functions.
   function gameOver () {
     gameActive = !gameActive;
+    if (score > highScore) {
+      highScore = score;
+    }
+    $highScore.text(highScore);
+    endSound.play();
     $endScreen.toggleClass('hidden');
     $main.toggleClass('mouseHider');
+  }
+
+  function nextLevel() {
+    clearGameSpace();
+    newGameSpace();
+    startTimer();
   }
 
   function checkWin () {
@@ -208,8 +243,8 @@ $(() => {
     shapeRotation = matrixToDegrees($shape);
 
     console.log(`Win condition as follows:
-      LEFT Window: ${holeLocation.left.toFixed(0)} - ${ (holeLocation.left + widthDifferential + 2).toFixed(0) }
-      TOP Window: ${holeLocation.top.toFixed(0)} - ${ (holeLocation.top + heightDifferential).toFixed(0) }
+      LEFT Window: ${holeLocation.left.toFixed(0)} - ${ (holeLocation.left + widthDifferential + (widthDifferential / 7)).toFixed(0) }
+      TOP Window: ${holeLocation.top.toFixed(0)} - ${ (holeLocation.top + heightDifferential + (heightDifferential / 7)).toFixed(0) }
       ROTATION Window: ${Math.abs(holeRotation - rotationDifferential)} - ${Math.abs(holeRotation + rotationDifferential)}
 
       Shape position as follows:
@@ -227,9 +262,9 @@ $(() => {
       holeRotation = ${holeRotation}, rotationDifferential = ${rotationDifferential}`);
 
     if (
-      (shapeLocation.left <= holeLocation.left + widthDifferential + (widthDifferential / 10)) &&
+      (shapeLocation.left <= holeLocation.left + widthDifferential + (widthDifferential / 7)) &&
       (shapeLocation.left >= holeLocation.left) &&
-      (shapeLocation.top <= holeLocation.top + heightDifferential + (heightDifferential / 10)) &&
+      (shapeLocation.top <= holeLocation.top + heightDifferential + (heightDifferential / 7)) &&
       (shapeLocation.top >= holeLocation.top) &&
       (shapeRotation <= holeRotation + rotationDifferential) &&
       (shapeRotation >= holeRotation - rotationDifferential)) {
@@ -238,27 +273,51 @@ $(() => {
       $score.text(score);
       blip.play();
       scoreAnimation('green');
-      if (score % 5 === 0) {
+      if (score === 1) {
+        boardRotationSpeed = boardRotationSpeed + 0.15;
+      }
+      if (score === 5) {
+        boardRotationSpeed = boardRotationSpeed + 0.1;
+      } else if (score % 5 === 0) {
         boardRotationSpeed = boardRotationSpeed + 0.25;
       }
       if (score % 10 === 0) {
         lives++;
         $lives.text(lives);
       }
-      clearGameSpace();
-      newGameSpace();
-      startTimer();
+      $board.animate({
+        backgroundColor: '#DDFFDD'
+      }, 'slow');
+      $hole.animate({
+        backgroundColor: '#DDFFDD'
+      });
+      $shape.animate({
+        opacity: 0
+      });
+      setTimeout(runFadeOuts, 1000);
+      setTimeout(nextLevel, 2500);
     } else if (lives > 0) {
       lives--;
       $lives.text(lives);
       thud.play();
       scoreAnimation('red');
-      clearGameSpace();
-      newGameSpace();
-      startTimer();
+      $shape.animate({
+        backgroundColor: '#A14545'
+      });
+      $board.animate({
+        backgroundColor: '#A14545'
+      });
+      setTimeout(nextLevel, 2000);
     } else {
       thud.play();
-      gameOver();
+      $shape.animate({
+        backgroundColor: '#A14545'
+      });
+      $board.animate({
+        backgroundColor: '#A14545'
+      });
+      setTimeout(runFadeOuts, 1000);
+      setTimeout(gameOver, 750);
     }
   }
 
@@ -280,6 +339,7 @@ $(() => {
   function reset() {
     score = 0;
     lives = 2;
+    boardRotationSpeed = 0;
     $score.text(score);
     $lives.text(lives);
     $endScreen.toggleClass('hidden');
@@ -294,23 +354,40 @@ $(() => {
   function pause() {
     if (!gamePaused) {
       clearInterval(timer);
-      gamePaused = !gamePaused;
+      gamePaused = true;
     } else {
       timer = setInterval(timeDown, 100);
-      gamePaused = !gamePaused;
+      gamePaused = false;
     }
-    $endScreen.toggleClass('hidden');
+    // $endScreen.toggleClass('hidden');
     $main.toggleClass('mouseHider');
   }
 
+  function revealInstructions() {
+    if ($reveal.text() === '') {
+      $reveal.text('Show Me');
+    } else {
+      $reveal.text('');
+    }
+    $reveal.toggleClass('reveal revealed', 1000);
+  }
+
   // Start game.
+  function start() {
+    $startScreen.toggleClass('hidden');
+    $main.toggleClass('mouseHider');
+    startTimer();
+    setInterval(rotateBoard, 50);
+    gameActive = true;
+  }
+
   newGameSpace();
-  startTimer();
-  setInterval(rotateBoard, 50);
 
   // _____________________________Event Listeners_______________________________
   $window.on('mousemove', mousePositionUpdate);
   $window.scroll(rotateShape);
+  $start.on('click', start);
   $reset.on('click', reset);
+  $reveal.on('click', revealInstructions);
   $time.on('click', pause);
 });

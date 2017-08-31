@@ -5,11 +5,15 @@
     <title>WDI Project 1</title>
     <!--  jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script
+  src="https://code.jquery.com/ui/1.12.0-beta.1/jquery-ui.min.js"
+  integrity="sha256-WyjlLy3rvVSitHOXMctYkMCOU6GAletPg+qniNKLCQM="
+  crossorigin="anonymous"></script>
     <!-- inject:js -->
     <script src="js/app.js"></script>
     <!-- endinject -->
     <!-- inject:css -->
-    <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poiret+One|Raleway:200" rel="stylesheet">
     <link rel="stylesheet" href="scss/style.scss">
     <!-- endinject -->
   </head>
@@ -28,14 +32,23 @@
         <span class="score">0</span>
       </div>
     </header>
-    <main class="game mouseHider">
+    <main class="game">
+      <div class="startScreen">
+        <h1>Shapes</h1>
+        <p>Welcome to shapes.  Score points by having your shape fit into the hole when the time runs out.  Use the mouse to move your shape and scroll to rotate it.</p>
+        <div class="reveal">Show Me</div>
+        <img src="images/instruction.gif" class="hidden">
+        <button class="start">Play</button>
+      </div>
       <div class="endScreen hidden">
         <h1>Game Over</h1>
         Final Score <span class="score">0</span>
-        <button>Play Again?</button>
+        High Score <span class="highScore">0</span>
+        <button class="reset">Play Again?</button>
       </div>
       <audio id="blip" src="audio/blip.wav"></audio>
       <audio id="thud" src="audio/thud.wav"></audio>
+      <audio id="gameEnd" src="audio/game-end.wav"></audio>
       <audio id="music" src="audio/ambience.wav" autoplay="autoplay" loop="loop"></audio>
     </main>
     </body>
