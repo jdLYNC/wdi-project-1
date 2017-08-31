@@ -133,7 +133,6 @@ button:hover {
   cursor: none;
 }
 
-.testerDiv {
-  background: red;
-  z-index: 5;
+body.noScroll {
+  overflow: hidden;
 }
