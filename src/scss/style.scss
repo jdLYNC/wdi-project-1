@@ -55,24 +55,22 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-}
-
-.startScreen p {
-  font-family: 'Raleway', sans-serif;
-  margin: 30px;
-  font-size: 16px;
-}
-
-img {
-  border: 2px solid black;
-  // width: 400px;
-  margin: 10px;
+  p {
+    font-family: 'Raleway', sans-serif;
+    margin: 30px;
+    font-size: 16px;
+  }
+  img {
+    border: 2px solid black;
+    margin: 10px;
+  }
 }
 
 .endScreen {
   background: white;
   height: 50vh;
   width: 40%;
+  min-width: 320px;
   z-index: 1;
   font-size: 25px;
   display: flex;
@@ -101,7 +99,7 @@ h1 {
 }
 
 .revealed {
-  width: 98%;
+  width: 92%;
   height: 45vh;
   padding: 0;
   background: url('../images/instruction.gif');
@@ -111,7 +109,7 @@ h1 {
 }
 
 button {
-  margin: 0 20px 20px 20px;
+  margin: 5px 20px 20px 20px;
   width: 64%;
   padding: 10px 22%;
   background-color: #EEEEEE;

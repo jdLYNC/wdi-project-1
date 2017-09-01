@@ -1,60 +1,51 @@
-// _____________________________Global Variables________________________________
-// Board size/position variables.
-const boardHeightMax = 700;
-const boardHeightMin = 200;
-const boardLeftPositonMax = 500;
-const boardLeftPositonMin = 100;
-const boardTopPositionMax = 300;
-const boardTopPositionMin = 200;
+const $window = $(window);
+const screenWidth = $window.width();
+const screenHeight = $window.height();
+// _________________________________Variables___________________________________
+// Board variables.
+const boardLeftPositonMin = screenWidth / 20; //formerly 100;
+const boardLeftPositonMax = screenWidth - (boardLeftPositonMin * 6); //formerly 500;
+const boardTopPositionMin = 200; //formerly screenHeight / 3;
+const boardTopPositionMax = 300; //formerly screenHeight - (boardTopPositionMin * 8);
+const boardHeightMax = screenWidth / 2; //formerly 700;
+const boardHeightMin = screenHeight / 4; //formerly 200;
 let boardRotation = 0;
-// Board global variables.
 let boardRotationSpeed = 0.1;
-
-// Hole size/position minimum constants.
+// Hole variables.
 const holeHeightMin = 50;
 const holeWidthMin = 50;
 const holeLeftPositionMin = 10;
 const holeTopPositionMin = 10;
-// Hole global variables.
 let holeRotation = 0;
-
-// Shape global variables.
-let shapeRotation = 0;
+let holeLocation = null;
+// Shape variables.
 const differential = 20;
+let shapeRotation = 0;
 let heightDifferential = null;
 let widthDifferential = null;
-
-// Win condition global variables.
-let lives = 2;
-let score = 0;
-
-// Timer global variables.
-let time = null;
-let timer = null;
-
-// Other game global variables.
+let shapeLocation = null;
+let xPosition = null;
+let yPosition = null;
+let rotationDifferential = null;
+// Generic variables.
 let topPosition = null;
 let leftPosition = null;
 let height = null;
 let width = null;
 let rotationAngle = null;
-
-let xPosition = null;
-let yPosition = null;
-let gameActive = false;
+// Timer variables.
+let time = null;
+let timer = null;
 let gamePaused = false;
+// Game variables.
+let lives = 2;
+let score = 0;
 let highScore = 0;
-
-let holeLocation = null;
-let shapeLocation = null;
-let rotationDifferential = null;
+let gameActive = false;
 let levelWon = null;
 
-// ________________________________On DOM Load__________________________________
 $(() => {
-
   // ______________________________DOM Elements_________________________________
-  const $window = $(window);
   const $document = $(document);
   const $body = $('body');
   const $main = $('.game');
@@ -76,7 +67,7 @@ $(() => {
   let $hole = null;
 
   // _______________________________FUNCTIONS___________________________________
-
+  // Generic Functions
   function rangePointSelector(max, min) {
     return Math.floor(Math.random() * (max - min) + min);
   }
@@ -91,6 +82,19 @@ $(() => {
     return Math.round(Math.asin(rotation) * (180 / Math.PI));
   }
 
+  function differentialMaker(){
+    heightDifferential = (height / 100) * differential;
+    widthDifferential = (width / 100) * differential;
+  }
+
+  function rotationDifferentialMaker() {
+    const holeSides = [height, width].sort((a, b) => {
+      return a - b;
+    });
+    rotationDifferential = Math.round(15 / (holeSides[1] / holeSides[0]));
+  }
+
+  // Gamespace Functions
   function dimensionMaker(heightMax, heightMin, widthMax, widthMin, topPositionMax, topPositionMin, leftPositionMax, leftPositionMin,  rotationMax, rotationMin) {
     height = rangePointSelector(heightMax, heightMin);
     width = rangePointSelector(widthMax, widthMin);
@@ -111,55 +115,11 @@ $(() => {
     }
   }
 
-  function differentialMaker(){
-    heightDifferential = (height / 100) * differential;
-    widthDifferential = (width / 100) * differential;
-  }
-
-  function rotationDifferentialMaker() {
-    const holeSides = [height, width].sort((a, b) => {
-      return a - b;
-    });
-    rotationDifferential = Math.round(15 / (holeSides[1] / holeSides[0]));
-  }
-
-  // Shape movement functions.
-  function mousePositionUpdate(e) {
-    xPosition = e.clientX - ((width - widthDifferential) / 2);
-    yPosition = e.clientY - ((height - heightDifferential) / 2);
-    if (gameActive) {
-      $shape.css({ left: xPosition, top: yPosition });
-    }
-  }
-
-  function rotateShape() {
-    const shapeRotation = $window.scrollTop() / 1000 % Math.PI;
-    $shape.css({ transform: 'rotate(' + shapeRotation + 'rad)' });
-    if (document.documentElement.clientHeight + $window.scrollTop() >= $document.height()) {
-      $document.scrollTop(0);
-    } else if ($window.scrollTop() < 1) {
-      $document.scrollTop($document.height());
-    }
-
-    // if(
-    //   matrixToDegrees($shape) <= Math.abs(matrixToDegrees($board)) + 2 &&
-    //   matrixToDegrees($shape) >= Math.abs(matrixToDegrees($board)) - 2
-    // ) console.log('nailed it!');
-  }
-
-  function rotateBoard() {
-    if (!gamePaused && gameActive) {
-      boardRotation += boardRotationSpeed;
-      $board.css({ transform: 'rotate(' + boardRotation + 'deg)' });
-    }
-  }
-
-  // Game space functions.
   function newGameSpace() {
     dimensionMaker(boardHeightMax, boardHeightMin, boardHeightMax, boardHeightMin, boardTopPositionMax, boardTopPositionMin, boardLeftPositonMax, boardLeftPositonMin, 90, -90);
     appender($main, 'board', height, width, topPosition, leftPosition, rotationAngle);
     $board = $('.board');
-    dimensionMaker(height/2, holeHeightMin, width/2, holeWidthMin, topPosition/2, holeTopPositionMin, leftPosition/2, holeLeftPositionMin, 0, 0);
+    dimensionMaker(height/2, holeHeightMin, width/2, holeWidthMin, height/4, holeTopPositionMin, width/4, holeLeftPositionMin, 0, 0);
     appender($board, 'hole', height, width, topPosition, leftPosition, rotationAngle);
     $hole = $('.hole');
     differentialMaker();
@@ -173,12 +133,44 @@ $(() => {
     $shape.remove();
   }
 
-  function runFadeOuts() {
-    $board.fadeOut(1000);
-    $shape.fadeOut(1000);
+  // Movement Functions
+  function mousePositionUpdate(e) {
+    xPosition = e.clientX - ((width - widthDifferential) / 2);
+    yPosition = e.clientY - ((height - heightDifferential) / 2);
+    if (gameActive) {
+      $shape.css({ left: xPosition, top: yPosition });
+    }
   }
 
-  // GUI functions.
+  function rotateShape() {
+    if (gameActive) {
+      const shapeRotation = $window.scrollTop() / 1000 % Math.PI;
+      $shape.css({ transform: 'rotate(' + shapeRotation + 'rad)' });
+    }
+    if (document.documentElement.clientHeight + $window.scrollTop() >= $document.height()) {
+      $document.scrollTop(0);
+    } else if ($window.scrollTop() < 1) {
+      $document.scrollTop($document.height());
+    }
+  }
+
+  function rotateBoard() {
+    if (!gamePaused && gameActive) {
+      boardRotation += boardRotationSpeed;
+      $board.css({ transform: 'rotate(' + boardRotation + 'deg)' });
+    }
+  }
+
+  // Animation Functions
+  function revealInstructions() {
+    if ($reveal.text() === '') {
+      $reveal.text('Show Me');
+    } else {
+      $reveal.text('');
+    }
+    $reveal.toggleClass('reveal revealed', 1000);
+  }
+
   function scoreAnimation(color) {
     $score.animate({
       color: color,
@@ -190,48 +182,9 @@ $(() => {
     }, 'slow');
   }
 
-  // Game logic functions.
-  function gameOver () {
-    gameActive = !gameActive;
-    if (score > highScore) {
-      highScore = score;
-    }
-    $highScore.text(highScore);
-    endSound.play();
-    $endScreen.toggleClass('hidden');
-    $main.toggleClass('mouseHider');
-    $body.toggleClass('noScroll');
-  }
-
-  function nextLevel() {
-    clearGameSpace();
-    newGameSpace();
-    startTimer();
-  }
-
-  function winChecker() {
-    if ((shapeLocation.left <= holeLocation.left + widthDifferential + (widthDifferential / 7)) &&
-    (shapeLocation.left >= holeLocation.left) &&
-    (shapeLocation.top <= holeLocation.top + heightDifferential + (heightDifferential / 7)) &&
-    (shapeLocation.top >= holeLocation.top) &&
-    (shapeRotation <= holeRotation + rotationDifferential) &&
-    (shapeRotation >= holeRotation - rotationDifferential)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  function levelManager() {
-    if (score === 1) {
-      boardRotationSpeed = boardRotationSpeed + 0.15;
-    } else if (score % 5 === 0) {
-      boardRotationSpeed = boardRotationSpeed + 0.25;
-    }
-    if (score % 10 === 0) {
-      lives++;
-      $lives.text(lives);
-    }
+  function runFadeOuts() {
+    $board.fadeOut(1000);
+    $shape.fadeOut(1000);
   }
 
   function gameAnimator(color) {
@@ -251,6 +204,50 @@ $(() => {
       });
     }
     setTimeout(runFadeOuts, 1000);
+  }
+
+  // Game Manager Functions.
+  function gameOver () {
+    gameActive = !gameActive;
+    if (score > highScore) {
+      highScore = score;
+    }
+    $highScore.text(highScore);
+    endSound.play();
+    $endScreen.toggleClass('hidden');
+    $main.toggleClass('mouseHider');
+    $body.toggleClass('noScroll');
+  }
+
+  function nextLevel() {
+    clearGameSpace();
+    newGameSpace();
+    startTimer();
+  }
+
+  function levelManager() {
+    if (score === 1) {
+      boardRotationSpeed = boardRotationSpeed + 0.15;
+    } else if (score % 5 === 0) {
+      boardRotationSpeed = boardRotationSpeed + 0.25;
+    }
+    if (score % 10 === 0) {
+      lives++;
+      $lives.text(lives);
+    }
+  }
+
+  function winChecker() {
+    if ((shapeLocation.left <= holeLocation.left + widthDifferential + (widthDifferential / 7)) &&
+    (shapeLocation.left >= holeLocation.left) &&
+    (shapeLocation.top <= holeLocation.top + heightDifferential + (heightDifferential / 7)) &&
+    (shapeLocation.top >= holeLocation.top) &&
+    (shapeRotation <= holeRotation + rotationDifferential) &&
+    (shapeRotation >= holeRotation - rotationDifferential)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   function win() {
@@ -292,6 +289,23 @@ $(() => {
     }
   }
 
+  function reset() {
+    score = 0;
+    lives = 2;
+    boardRotationSpeed = 0.1;
+    $score.text(score);
+    $lives.text(lives);
+    $endScreen.toggleClass('hidden');
+    $main.toggleClass('mouseHider');
+    $body.toggleClass('noScroll');
+    gameActive = true;
+    clearInterval(timer);
+    clearGameSpace();
+    newGameSpace();
+    startTimer();
+  }
+
+  // Timer Functions
   function timeDown() {
     if (time >= 0) {
       $time.text(time);
@@ -307,47 +321,25 @@ $(() => {
     timer = setInterval(timeDown, 100);
   }
 
-  function reset() {
-    score = 0;
-    lives = 2;
-    boardRotationSpeed = 0;
-    $score.text(score);
-    $lives.text(lives);
-    $endScreen.toggleClass('hidden');
-    $main.toggleClass('mouseHider');
-    $body.toggleClass('noScroll');
-    gameActive = true;
-    clearInterval(timer);
-    clearGameSpace();
-    newGameSpace();
-    startTimer();
-  }
-
   function pause() {
-    if (!gamePaused) {
-      clearInterval(timer);
-      music.pause();
-      gamePaused = true;
-      gameActive = false;
-    } else {
-      timer = setInterval(timeDown, 100);
-      gamePaused = false;
-      gameActive = true;
-      music.play();
+    if (time > 0) {
+      if (!gamePaused) {
+        clearInterval(timer);
+        music.pause();
+        gamePaused = true;
+        gameActive = false;
+      } else {
+        timer = setInterval(timeDown, 100);
+        gamePaused = false;
+        gameActive = true;
+        music.play();
+      }
+      $main.toggleClass('mouseHider');
+      $body.toggleClass('noScroll');
     }
-    $main.toggleClass('mouseHider');
-    $body.toggleClass('noScroll');
   }
 
-  function revealInstructions() {
-    if ($reveal.text() === '') {
-      $reveal.text('Show Me');
-    } else {
-      $reveal.text('');
-    }
-    $reveal.toggleClass('reveal revealed', 1000);
-  }
-
+  // Debug Functions
   function winReporter() {
     console.log(`Win condition as follows:
       LEFT Window: ${holeLocation.left.toFixed(0)} - ${ (holeLocation.left + widthDifferential + (widthDifferential / 7)).toFixed(0) }
@@ -376,12 +368,11 @@ $(() => {
     $startScreen.toggleClass('hidden');
     $main.toggleClass('mouseHider');
     $body.toggleClass('noScroll');
+    newGameSpace();
     startTimer();
     setInterval(rotateBoard, 50);
     gameActive = true;
   }
-
-  newGameSpace();
 
   // _____________________________Event Listeners_______________________________
   $window.on('mousemove', mousePositionUpdate);
