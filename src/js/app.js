@@ -36,6 +36,8 @@ let rotationAngle = null;
 // Timer variables.
 let time = null;
 let timer = null;
+let fadeTimer = null;
+let timeoutTimer = null;
 let gamePaused = false;
 // Game variables.
 let lives = 2;
@@ -203,7 +205,7 @@ $(() => {
         backgroundColor: color
       });
     }
-    setTimeout(runFadeOuts, 1000);
+    fadeTimer = setTimeout(runFadeOuts, 1000);
   }
 
   // Game Manager Functions.
@@ -290,7 +292,7 @@ $(() => {
     scoreAnimation('green');
     gameAnimator('#DDFFDD');
     levelManager();
-    setTimeout(nextLevel, 2500);
+    timeoutTimer = setTimeout(nextLevel, 2500);
   }
 
   function lose() {
@@ -299,14 +301,14 @@ $(() => {
     thud.play();
     scoreAnimation('red');
     gameAnimator('#A14545');
-    setTimeout(nextLevel, 2000);
+    timeoutTimer = setTimeout(nextLevel, 2000);
   }
 
   function end() {
     thud.play();
     scoreAnimation('red');
     gameAnimator('#A14545');
-    setTimeout(gameOver, 750);
+    timeoutTimer = setTimeout(gameOver, 750);
   }
 
   function endLevel () {
@@ -359,21 +361,23 @@ $(() => {
   }
 
   function pause() {
-    if (time > 0) {
-      if (!gamePaused) {
-        clearInterval(timer);
-        music.pause();
-        gamePaused = true;
-        gameActive = false;
-      } else {
-        timer = setInterval(timeDown, 100);
-        gamePaused = false;
-        gameActive = true;
-        music.play();
-      }
-      $main.toggleClass('mouseHider');
-      $body.toggleClass('noScroll');
+    if (!gamePaused) {
+      clearInterval(timer);
+      gamePaused = true;
+      gameActive = false;
+      music.pause();
+      fadeTimer.pause();
+      timeoutTimer.pause();
+    } else {
+      timer = setInterval(timeDown, 100);
+      gamePaused = false;
+      gameActive = true;
+      music.play();
+      fadeTimer.play();
+      timeoutTimer.play();
     }
+    $main.toggleClass('mouseHider');
+    $body.toggleClass('noScroll');
   }
 
   // Debug Functions
