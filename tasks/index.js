@@ -8,8 +8,8 @@ const config           = require('../package').gulp;
 
 const validateIndex = () => {
   return gulp.src(`${config.srcDir}${config.main.index}`)
-  .pipe(htmlhint({'doctype-first': false}))
-  .pipe(htmlhint.reporter('htmlhint-stylish'));
+    .pipe(htmlhint({'doctype-first': false}))
+    .pipe(htmlhint.reporter('htmlhint-stylish'));
 };
 
 const buildIndex = () => {
@@ -18,13 +18,13 @@ const buildIndex = () => {
 
   return validateIndex()
     // write first to get relative path for inject
-    .pipe(gulp.dest(config.destDir))
+    .pipe(gulp.dest('./'))
     .pipe(gulpIf(!global.production, inject(js, {relative: true, addRootSlash: true})))
     .pipe(gulpIf(!global.production,inject(css, {relative: true, addRootSlash: true})))
     .pipe(gulpIf(global.production, inject(js, {relative: false, addRootSlash: true})))
     .pipe(gulpIf(global.production,inject(css, {relative: false, addRootSlash: true})))
     .pipe(gulpIf(global.production, htmlmin({collapseWhitespace: true, removeComments: true})))
-    .pipe(gulp.dest(config.destDir))
+    .pipe(gulp.dest('./'))
     .pipe(gulpIf(!global.production, browserSync.stream()));
 };
 

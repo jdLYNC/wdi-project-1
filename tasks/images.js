@@ -25,7 +25,7 @@ const buildImages = () => {
     cleanImages(),
     copyImages()
   )
-  .pipe(browserSync.stream());
+    .pipe(browserSync.stream());
 };
 
 gulp.task('build-images', buildImages);
