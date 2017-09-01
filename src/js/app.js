@@ -19,7 +19,7 @@ const holeTopPositionMin = 10;
 let holeRotation = 0;
 let holeLocation = null;
 // Shape variables.
-const differential = 20;
+let differential = 20;
 let shapeRotation = 0;
 let heightDifferential = null;
 let widthDifferential = null;
@@ -234,17 +234,50 @@ $(() => {
     if (score % 10 === 0) {
       lives++;
       $lives.text(lives);
+      differential--;
+    }
+  }
+
+  function rotationChecker() {
+    if (rotationDifferential >= 12) {
+      if ( ((shapeRotation <= (holeLocation.left - 90) + widthDifferential + (widthDifferential / 7)) &&
+        (shapeLocation.left >= holeLocation.left - 90)) ||
+        ((shapeRotation <= holeRotation + rotationDifferential) &&
+        (shapeRotation >= holeRotation - rotationDifferential)) ) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      if ((shapeRotation <= holeRotation + rotationDifferential) &&
+      (shapeRotation >= holeRotation - rotationDifferential)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  function locationChecker() {
+    if ((shapeLocation.left <= holeLocation.left + widthDifferential + (widthDifferential / 7)) &&
+    (shapeLocation.left >= holeLocation.left) &&
+    (shapeLocation.top <= holeLocation.top + heightDifferential + (heightDifferential / 7)) &&
+    (shapeLocation.top >= holeLocation.top)) {
+      return true;
+    } else {
+      return false;
     }
   }
 
   function winChecker() {
-    if ((shapeLocation.left <= holeLocation.left + widthDifferential + (widthDifferential / 7)) &&
-    (shapeLocation.left >= holeLocation.left) &&
-    (shapeLocation.top <= holeLocation.top + heightDifferential + (heightDifferential / 7)) &&
-    (shapeLocation.top >= holeLocation.top) &&
-    (shapeRotation <= holeRotation + rotationDifferential) &&
-    (shapeRotation >= holeRotation - rotationDifferential)) {
-      return true;
+    const rightRotation = rotationChecker();
+    if (rightRotation) {
+      const rightLocation = locationChecker();
+      if (rightLocation) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
@@ -269,6 +302,13 @@ $(() => {
     setTimeout(nextLevel, 2000);
   }
 
+  function end() {
+    thud.play();
+    scoreAnimation('red');
+    gameAnimator('#A14545');
+    setTimeout(gameOver, 750);
+  }
+
   function endLevel () {
     holeLocation = $hole.offset();
     shapeLocation = $shape.offset();
@@ -282,10 +322,7 @@ $(() => {
     } else if (lives > 0) {
       lose();
     } else {
-      thud.play();
-      scoreAnimation('red');
-      gameAnimator('#A14545');
-      setTimeout(gameOver, 750);
+      end();
     }
   }
 
