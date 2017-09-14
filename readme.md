@@ -1,7 +1,6 @@
 # GA WDI Project 1 - Shapes
 
 <img src="https://i.imgur.com/dqFmB9N.png" alt="shapes game start menu">
-> Shapes start menu
 
 ## Premise
 Shapes is a 'hole-in-the-wall' style game.  The aim is to fit your shape inside the hole when time the time runs out.
