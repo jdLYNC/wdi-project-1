@@ -1,19 +1,33 @@
-# Shapes
+# GA WDI Project 1 - Shapes
 
-*GA WDI Project-1
+<img src="" alt="shapes game">
 
-### Installation and set-up
+## Premise
+Shapes is a 'hole-in-the-wall' style game.  The aim is to fit your shape inside the hole when time the time runs out.
 
-### Premise
-Shapes is a 'hole-in-the-wall' style game.  The aim is to position your shape inside the hole before the time runs out.  The shape's movement is tied to the mouse position and its rotation is controlled by scrolling.
+## Brief
+To build a browser-based game using HTML, CSS and JavaScript.
 
-### Approach
+## Technologies used
+* HTML5
+* CSS, **SCSS**, **Gulp**
+* JavaScript, **JQuery**
 
-### Challenges
-The primary challenge for coding Shapes was the win condition.  To win a level the user is required to position their shape clearly within the boards 'hole'.  In the code this translated to a condition which checked both the offset and rotation of the .shape <div> against the same properties of the .hole <div> and an additional margin.
+## Features
+Shapes features a timer, x/y position mapping and manipulation and element rotation (controlled and automatic) in its game logic.  Other features include start and end game menus, a non-persistent high score record, animated gif instructions and background and triggered audio.
 
-This solution presented a key issue, the absence of rotation on the 'win window' created by the hole's offset and added margin (as well as the win windows untrackable movement to the current top-left-most corner during rotation).  To surpass the rotation issue I instead opted to
+## Challenges
+The primary challenge with Shapes was in programming the win condition.  Adding rotation to the target hole made an otherwise simple task highly complex.  The reason for this was the way the win condition was measured, checking the x/y position of the hole (specifically its top left corner) and comparing this with the x/y position of the shape (also its top left corner). ...
 
-This solution presented two key issues, first how to deduce the <div>s' rotation, second the absence of rotation on the 'win window' created by the hole's offset and added margin.  Solving the first issue required the creation of a new function that converted the 6 digit matrix string returned by jQuery .css('transform') into a number of degrees.  This enabled the program to pull rotation data in a manner that was both easily intelligible and comparable.
+## Successes
 
-The second issue
+
+## Improvements
+
+### Technical Changes
+
+### Non-technical Changes
+
+
+## Link ##
+[Visit Shapes on Heroku](https://shapes-app.herokuapp.com/ "Shapes")
