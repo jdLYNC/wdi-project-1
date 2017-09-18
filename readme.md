@@ -1,4 +1,5 @@
 # GA WDI Project 1 - Shapes
+[Improvements](#improvements "improvements")
 
 <img src="https://i.imgur.com/dqFmB9N.png" alt="shapes game start menu">
 
