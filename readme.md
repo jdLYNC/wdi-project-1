@@ -1,5 +1,5 @@
 # GA WDI Project 1 - Shapes
-[Improvements](#improvements "improvements")
+[Premise](#premise "premise")[Brief](#brief "brief")[Approach](#approach "approach")[Technologies](#technologies used "technologies")[Features](#features "features")[Challenges](#challenges "challenges")[Successes](#succeses "succeses")[Improvements](#improvements "improvements")[Shapes](https://shapes-app.herokuapp.com/ "Shapes")
 
 <img src="https://i.imgur.com/dqFmB9N.png" alt="shapes game start menu">
 
