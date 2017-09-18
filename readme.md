@@ -9,7 +9,7 @@ Shapes is a 'hole-in-the-wall' style game.  The aim is to fit your shape inside 
 To build a browser-based game using HTML, CSS and JavaScript.
 
 ## Approach
-After being presented with the project brief I considered several ideas for appropriate products, my selection criterea were based upon finding an idea that would push the limits of the skills I had learnt so far while also being simple enough for me to deliver a polished and professional looking product within the deadline.
+After being presented with the project brief I considered several ideas for appropriate products, my selection criterea were based on finding an idea that would push the limits of the skills I had learnt so far, while also being simple enough for me to deliver a polished and professional product within the deadline.
 
 Once I had settled on the idea of Shapes my goal was to reach an MVP as early as possible.  I created the basic styling early on to gain a better feeling for the final product throughout the development process and then worked quickly towards the basic controls and the win/lose conditions.  Once these the were completed the second half of the project week was devoted to gaining user feedback, finetuning the win/lose conditions and adding additional styling and ancilliary functionality.
 
