@@ -48,17 +48,6 @@ The solution to this was to add an extra element to the win condition, measuring
     }
   }
 
-  function locationChecker() {
-    if ((shapeLocation.left <= holeLocation.left + widthDifferential + (widthDifferential / 7)) &&
-    (shapeLocation.left >= holeLocation.left) &&
-    (shapeLocation.top <= holeLocation.top + heightDifferential + (heightDifferential / 7)) &&
-    (shapeLocation.top >= holeLocation.top)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   function winChecker() {
     const rightRotation = rotationChecker();
     if (rightRotation) {
@@ -71,8 +60,10 @@ The solution to this was to add an extra element to the win condition, measuring
     } else {
       return false;
     }
+    
 ```
 However, this solution presented an additional problem in that the rotation data returned by jQuery ` .css(transform) ` was in the form of a 6 digit matrix in a string.  To use this data a new function was required to convert this data into a useable number of degrees.
+
 ```
   function matrixToDegrees(gameItem) {
     let rotation = gameItem
