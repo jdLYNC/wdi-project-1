@@ -26,7 +26,64 @@ Shapes features a timer, offset position mapping and manipulation and element ro
 The primary challenge with Shapes was programming the win condition.  Adding continuous rotation to the target hole made an otherwise simple task highly complex.  The reason for this being the way the win condition was measured, comparing the offset of the hole `<div>` with the offset of the shape `<div>`.  The problem this presented was twofold, first the 'win window' (the offset of the hole with an added margin on both axes) did not rotate with the hole resulting in it quickly losing alignment with the hole (illustrated below) and triggering wins and losses incorrectly.
 
 <img src="https://i.imgur.com/Z9vAzS8.jpg" alt="shapes game start menu">
-The solution to this was to add an extra element to the win condition, measuring and comparing the rotation of the hole and shape as well as their offset.  However, this solution presented an additional problem in that the rotation data returned by jQuery `.css(transform)` was in the form of a 6 digit matrix in a string.  To use this data a new function was required to convert this data into a useable number of degrees.
+The solution to this was to add an extra element to the win condition, measuring and comparing the rotation of the hole and shape as well as their offset.  
+```
+  function rotationChecker() {
+    if (rotationDifferential >= 12) {
+      if ( ((shapeRotation <= (holeLocation.left - 90) + widthDifferential + (widthDifferential / 7)) &&
+        (shapeLocation.left >= holeLocation.left - 90)) ||
+        ((shapeRotation <= holeRotation + rotationDifferential) &&
+        (shapeRotation >= holeRotation - rotationDifferential)) ) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      if ((shapeRotation <= holeRotation + rotationDifferential) &&
+      (shapeRotation >= holeRotation - rotationDifferential)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  function locationChecker() {
+    if ((shapeLocation.left <= holeLocation.left + widthDifferential + (widthDifferential / 7)) &&
+    (shapeLocation.left >= holeLocation.left) &&
+    (shapeLocation.top <= holeLocation.top + heightDifferential + (heightDifferential / 7)) &&
+    (shapeLocation.top >= holeLocation.top)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function winChecker() {
+    const rightRotation = rotationChecker();
+    if (rightRotation) {
+      const rightLocation = locationChecker();
+      if (rightLocation) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+```
+However, this solution presented an additional problem in that the rotation data returned by jQuery ` .css(transform) ` was in the form of a 6 digit matrix in a string.  To use this data a new function was required to convert this data into a useable number of degrees.
+```
+  function matrixToDegrees(gameItem) {
+    let rotation = gameItem
+      .css('transform')
+      .replace('matrix(','')
+      .replace(')','')
+      .split(',');
+    rotation = parseFloat(rotation[1]);
+    return Math.round(Math.asin(rotation) * (180 / Math.PI));
+  }
+```
 
 ## Successes
 Throughout the project I sought user testing from my peers and implemented clear instructions and improved audio-visual queues to user during play as a result of their feedback.
